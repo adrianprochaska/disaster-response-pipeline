@@ -6,4 +6,3 @@ class TestClass:
     def test_pep8_data2(self):
         assert 1 == 1
         pass
-
