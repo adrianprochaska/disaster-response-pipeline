@@ -307,3 +307,4 @@ poetry.toml
 *cost-of-living*.csv
 fig/
 *DisasterResponse.db
+!test_data/*
