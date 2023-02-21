@@ -165,7 +165,7 @@ class TestClass:
             './test_data/DisasterResponse.db'
         )
 
-        assert len(category_names) == 36
+        assert len(category_names) == 35
         assert category_names[0] == 'related'
 
     def test_tokenize(self):
