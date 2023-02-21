@@ -11,7 +11,7 @@ import pickle
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from models.train_classifier import load_dataframe
+from models.train_classifier import load_dataframe  # noqa: E402
 
 app = Flask(__name__)
 
@@ -20,6 +20,9 @@ df = load_dataframe('../data/DisasterResponse.db')
 
 # load model
 model_path = '..\\models\\classifier.pkl'
+# model = joblib.load(open(model_path, 'rb'))
+
+# test_model_path = '.\\test_data\\test_model.pkl'
 model = pickle.load(open(model_path, 'rb'))
 
 
