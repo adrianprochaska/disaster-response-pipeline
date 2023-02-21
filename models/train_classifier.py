@@ -3,7 +3,7 @@ import sys
 # import libraries
 import pandas as pd
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, inspect
 
 import re
 
@@ -22,7 +22,7 @@ from sklearn.metrics import f1_score
 from imblearn.over_sampling import SMOTE
 from imblearn.pipeline import Pipeline
 
-import pickle
+import joblib
 
 
 def load_data(database_filepath):
@@ -137,7 +137,7 @@ def save_model(model, model_filepath):
     """
     The function saves the trained model into model_filepath.
     """
-    pickle.dump(model, open(model_filepath, 'wb'))
+    joblib.dump(model, open(model_filepath, 'wb'))
 
     return
 
