@@ -308,3 +308,4 @@ poetry.toml
 fig/
 *DisasterResponse.db
 !test_data/*
+*classifier.pkl

@@ -18,6 +18,8 @@ from imblearn.over_sampling import SMOTE
 
 import pickle
 
+import sys
+
 
 class TestClass:
     """
@@ -77,24 +79,78 @@ class TestClass:
         category_names = process_data.get_category_names(df_test)
         assert category_names == ['related', 'request', 'offer']
 
-    def test_clean_data(self):
+    def test_clean_data_out_of_range(self):
         """
         Test the clean_data function
         """
         # test input
         dict_test = {
-            'id': [1, 2, 3, 3],
-            '1': 4*[None],
-            '2': 4*[None],
-            '3': 4*[None],
-            'related': [1, 1, 1, 1],
-            'request': [1, 2, 0, 0],
-            'offer': [0, 1, 1, 1]
+            'id': [1, 2, 3],
+            '1': 3*[''],
+            '2': 3*[''],
+            '3': 3*[''],
+            'related': [1, 1, 0],
+            'request': [1, 2, 0],
+            'offer': [0, 1, 1]
         }
         df_test = pd.DataFrame(dict_test)
 
         # validation dataframe
+        # values should be 1 or 0
+        # messages with values out of range shall be removed
         df_true = df_test.iloc[[0, 2], :]
+
+        df_cleaned = process_data.clean_data(df_test)
+
+        pd.testing.assert_frame_equal(df_cleaned, df_true, check_dtype=False)
+
+        assert True
+
+    def test_clean_data_duplicate_rows(self):
+        """
+        Test the clean_data function
+        """
+        # test input
+        dict_test = {
+            'id': [1, 3, 3],
+            '1': 3*[''],
+            '2': 3*[''],
+            '3': 3*[''],
+            'related': [1, 0, 0],
+            'request': [1, 0, 0],
+            'offer': [0, 1, 1]
+        }
+        df_test = pd.DataFrame(dict_test)
+
+        # validation dataframe
+        # duplicate rows shall be removed
+        df_true = df_test.iloc[:2, :]
+
+        df_cleaned = process_data.clean_data(df_test)
+
+        pd.testing.assert_frame_equal(df_cleaned, df_true, check_dtype=False)
+
+        assert True
+
+    def test_clean_data_oneclass_column(self):
+        """
+        Test the clean_data function
+        """
+        # test input
+        dict_test = {
+            'id': [1, 2, 3],
+            '1': 3*[''],
+            '2': 3*[''],
+            '3': 3*[''],
+            'related': [1, 1, 1],
+            'request': [0, 0, 0],
+            'offer': [0, 0, 1]
+        }
+        df_test = pd.DataFrame(dict_test)
+
+        # validation dataframe
+        # categories only containing 1s or 0s shall be removed.
+        df_true = df_test.drop(['related', 'request'], axis=1)
 
         df_cleaned = process_data.clean_data(df_test)
 
@@ -108,7 +164,7 @@ class TestClass:
         train classifier script.
         """
         _, _, category_names = train_classifier.load_data(
-            '.\\test_data\\DisasterResponse.db'
+            './test_data/DisasterResponse.db'
         )
 
         assert len(category_names) == 36
@@ -213,3 +269,15 @@ class TestClass:
 
         # remove test_model from test_path
         os.remove(save_path)
+
+    def test_train_classifier_main(self):
+        """
+        Tests the whole buidling pipeline of train_classifier
+        """
+        sys.argv = [
+            'train_classifier.py',
+            'test_data/DisasterResponse.db',
+            'test_data/classifier.pkl'
+        ]
+
+        train_classifier.main()

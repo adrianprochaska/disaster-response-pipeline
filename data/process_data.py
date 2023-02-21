@@ -1,5 +1,6 @@
 import sys
 import pandas as pd
+import numpy as np
 from sqlalchemy import create_engine
 
 
@@ -70,9 +71,12 @@ def clean_data(df):
     First, it removes rows with invalid data.
     Second, it drops duplicates.
     """
+    # first index of the columns containing categories
+    idx_cat_start = 4
     # find rows with invalid data in the category columns
     # values not equal to zero or one are invalid
-    idx_cell_invalid = (df.iloc[:, 4:] != 1) & (df.iloc[:, 4:] != 0)
+    idx_cell_invalid = ((df.iloc[:, idx_cat_start:] != 1) &
+                        (df.iloc[:, idx_cat_start:] != 0))
     idx_row_invalid = idx_cell_invalid.any(axis=1)
 
     # drop invalid rows
@@ -81,7 +85,26 @@ def clean_data(df):
     # drop duplicates
     df = df.drop_duplicates()
 
-    return df
+    # remove one-class-columns
+    # index of multiclass columns
+    idx_multiclass = np.any(
+        df.iloc[:, idx_cat_start:] - df.iloc[0, idx_cat_start:] != 0,
+        axis=0
+    )
+
+    # only change dataframe if a column must be removed
+    if any(~idx_multiclass):
+        # dataframe with only multiclass columns
+        df_multiclass = df.iloc[:, idx_cat_start:].loc[:, idx_multiclass]
+
+        # merge left part of dataframe with multiclass dataframe
+        df_return = pd.concat(
+            [df.iloc[:, :idx_cat_start], df_multiclass],
+            axis=1)
+    else:
+        df_return = df
+
+    return df_return
 
 
 def save_data(df, database_filename):

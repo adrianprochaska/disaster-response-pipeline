@@ -30,13 +30,8 @@ def load_data(database_filepath):
     The function loads the data from a given database.
     It expects the table in the database to be called 'Message'.
     """
-
-    # load data from database
-    engine = create_engine('sqlite:///{}'.format(database_filepath))
-
-    # read the whole data set
-    df = pd.read_sql_table('Message', engine)
-
+    # load dataframe from SQL
+    df = load_dataframe(database_filepath)
     # assign input and target data
     X = df.loc[:, 'message']
     idx_start_target = df.columns.get_loc('genre') + 1
@@ -46,6 +41,20 @@ def load_data(database_filepath):
     category_names = Y.columns
 
     return X, Y, category_names
+
+
+def load_dataframe(database_filename):
+    # load data from database
+    engine = create_engine('sqlite:///{}'.format(database_filename))
+
+    # get table name and use the first one
+    inspector = inspect(engine)
+    table_name = inspector.get_table_names()[0]
+
+    # read the whole data set
+    df = pd.read_sql_table(table_name, engine)
+
+    return df
 
 
 def tokenize(text):
