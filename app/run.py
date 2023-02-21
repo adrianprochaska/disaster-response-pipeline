@@ -1,38 +1,26 @@
 import json
 import plotly
-import pandas as pd
-
-from nltk.stem import WordNetLemmatizer
-from nltk.tokenize import word_tokenize
 
 from flask import Flask
-from flask import render_template, request  # , jsonify # potentially unused
+from flask import render_template, request
 from plotly.graph_objs import Bar
-from sklearn.externals import joblib
-from sqlalchemy import create_engine
 
+import pickle
+
+# import load_dataframe and add parent path to search path
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from models.train_classifier import load_dataframe
 
 app = Flask(__name__)
 
-
-def tokenize(text):
-    tokens = word_tokenize(text)
-    lemmatizer = WordNetLemmatizer()
-
-    clean_tokens = []
-    for tok in tokens:
-        clean_tok = lemmatizer.lemmatize(tok).lower().strip()
-        clean_tokens.append(clean_tok)
-
-    return clean_tokens
-
-
 # load data
-engine = create_engine('sqlite:///../data/YourDatabaseName.db')
-df = pd.read_sql_table('YourTableName', engine)
+df = load_dataframe('../data/DisasterResponse.db')
 
 # load model
-model = joblib.load("../models/your_model_name.pkl")
+model_path = '..\\models\\classifier.pkl'
+model = pickle.load(open(model_path, 'rb'))
 
 
 # index webpage displays cool visuals and receives user input text for model
