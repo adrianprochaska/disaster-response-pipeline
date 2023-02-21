@@ -1,6 +1,22 @@
 import os
 import data.process_data as process_data
+import models.train_classifier as train_classifier
 import pandas as pd
+
+# from models.train_classifier import tokenize
+
+from sklearn.multioutput import MultiOutputClassifier
+# from sklearn.pipeline import FeatureUnion
+# from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
+# from sklearn.linear_model import LogisticRegressionCV
+from sklearn.linear_model import LogisticRegression
+# from sklearn.metrics import classification_report
+from sklearn.metrics import f1_score
+
+from imblearn.over_sampling import SMOTE
+# from imblearn.pipeline import Pipeline
+
+import pickle
 
 
 class TestClass:
@@ -8,13 +24,6 @@ class TestClass:
     Test class for disaster response pipeline.
     Tests the basic scripts of this project
     """
-
-    def test_process_data(self):
-        """
-        Runs the script process_data.py with the given arguments.
-        """
-        os.system(('process_data.py disaster_messages.csv '
-                   'disaster_categories.csv DisasterResponse.db'))
 
     def test_load_data(self):
         """
@@ -92,3 +101,115 @@ class TestClass:
         pd.testing.assert_frame_equal(df_cleaned, df_true, check_dtype=False)
 
         assert True
+
+    def test_load_data_train(self):
+        """
+        This function tests the load data functionality of the
+        train classifier script.
+        """
+        _, _, category_names = train_classifier.load_data(
+            '.\\test_data\\DisasterResponse.db'
+        )
+
+        assert len(category_names) == 36
+        assert category_names[0] == 'related'
+
+    def test_tokenize(self):
+        """
+        This function tests the tokenize function.
+        """
+        text_test = 'Can you please help me? Yes, I can!'
+        token_out = train_classifier.tokenize(text_test)
+
+        token_validate = ['please', 'help', 'yes']
+        assert token_out == token_validate
+
+    def test_build_model(self):
+        """
+        This function tests the build_model function.
+        """
+
+        pipeline = train_classifier.build_model()
+
+        if not isinstance(
+            pipeline.named_steps['clf'].estimator.named_steps['smt'],
+            SMOTE
+        ):
+            assert False
+
+    def test_evaluate_model(self):
+        """
+        This function tests the evaluate_model function.
+        """
+        # create train data set
+        X_train = pd.DataFrame([
+            [0],
+            [1]
+        ])
+        y_train = pd.DataFrame([
+            [0, 1],
+            [1, 0]
+        ])
+
+        # create an easy small model
+        mdl = MultiOutputClassifier(LogisticRegression()).fit(X_train, y_train)
+
+        # create test data set
+        X_test = pd.DataFrame([
+            [0],
+            [0],
+            [1],
+            [1]
+        ])
+        y_pred = pd.DataFrame([
+            [0, 1],
+            [0, 1],
+            [1, 0],
+            [1, 0]
+        ])
+        y_true = pd.DataFrame([
+            [0, 1],
+            [1, 1],
+            [0, 1],
+            [1, 1]
+        ])
+
+        # calculate F1-score manually
+        # F1 = 2 * (precision * recall) / (precision + recall)
+        f1score_validate = f1_score(y_true, y_pred, average=None)
+
+        # embed F1-score in print string
+
+        # calculate F1-score using the new funktion
+        f1score_test = train_classifier.evaluate_model(
+            mdl,
+            X_test,
+            y_true,
+            category_names=['cat1', 'cat2']
+        )
+
+        # compare strings
+        assert all(f1score_validate == f1score_test)
+
+    def test_save_model(self):
+        """
+        This function tests the save_model function.
+        """
+        # load test_model
+        test_model_path = '.\\test_data\\test_model.pkl'
+        model = pickle.load(open(test_model_path, 'rb'))
+
+        # save test_model to a test_path
+        save_path = '.\\test_data\\pytest_model.pkl'
+        train_classifier.save_model(model, save_path)
+
+        # load it again
+        model_reload = pickle.load(open(test_model_path, 'rb'))
+
+        # compare models and assert False if they are not the same
+        assert isinstance(model_reload, type(model))
+
+        assert model.named_steps.keys() == model_reload.named_steps.keys()
+
+        # remove test_model from test_path
+        os.remove(save_path)

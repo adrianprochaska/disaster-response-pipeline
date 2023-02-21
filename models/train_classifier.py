@@ -1,26 +1,136 @@
 import sys
 
+# import libraries
+import pandas as pd
+
+from sqlalchemy import create_engine
+
+import re
+
+# import nltk
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+from nltk.stem.wordnet import WordNetLemmatizer
+
+from sklearn.multioutput import MultiOutputClassifier
 from sklearn.model_selection import train_test_split
+from sklearn.pipeline import FeatureUnion
+from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
+from sklearn.linear_model import LogisticRegressionCV
+from sklearn.metrics import f1_score
+
+from imblearn.over_sampling import SMOTE
+from imblearn.pipeline import Pipeline
+
+import pickle
 
 
 def load_data(database_filepath):
-    pass
+    """
+    The function loads the data from a given database.
+    It expects the table in the database to be called 'Message'.
+    """
+
+    # load data from database
+    engine = create_engine('sqlite:///{}'.format(database_filepath))
+
+    # read the whole data set
+    df = pd.read_sql_table('Message', engine)
+
+    # assign input and target data
+    X = df.loc[:, 'message']
+    idx_start_target = df.columns.get_loc('genre') + 1
+    Y = df.iloc[:, idx_start_target:]
+
+    # get category names of target data
+    category_names = Y.columns
+
+    return X, Y, category_names
 
 
 def tokenize(text):
-    pass
+    """
+    The function tokenizes the a given string.
+    The folling steps are performed.
+    - normalize the cases and remove punctuation
+    - tokenize the text using nltk's word_tokenize
+    - lemmatize text and remove stop words
+    """
+    # initialize stop words and WordLemmatizer
+    stop_words = stopwords.words("english")
+    lemmatizer = WordNetLemmatizer()
+
+    # normalize case and remove punctuation
+    text = re.sub(r"[^a-zA-Z0-9]", " ", text.lower())
+
+    # tokenize text
+    tokens = word_tokenize(text)
+
+    # lemmatize and remove stop words
+    tokens = [lemmatizer.lemmatize(word) for word in tokens
+              if word not in stop_words]
+
+    return tokens
 
 
 def build_model():
-    pass
+    """
+    The function builds a fixed model pipeline and returns it.
+    """
+    pipeline = Pipeline([
+        ('features', FeatureUnion([
+
+            ('nlp_pipeline', Pipeline([
+                ('vect', CountVectorizer(
+                    tokenizer=tokenize,
+                    token_pattern=None
+                )),  # to deactivate warning
+                ('tfidf', TfidfTransformer())
+            ])),
+
+            # ('txt_len', TextLengthExtractor())
+        ])),
+
+        ('clf', MultiOutputClassifier(
+            Pipeline([
+                ('smt', SMOTE()),
+                ('LogReg', LogisticRegressionCV(solver='liblinear'))
+            ])
+        ))
+    ])
+
+    return pipeline
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
-    pass
+    """
+    The function evaluates model performance and outputs the f1-score for each
+    target variable.
+    """
+    # predict test set
+    Y_test_pred = model.predict(X_test)
+
+    # initialize result list
+    f1scores = []
+    # calculate and print the F1-score for each predicted category
+    for idx, column in enumerate(category_names):
+        # calculate F1-score
+        f1scores.append(f1_score(Y_test.iloc[:, idx], Y_test_pred[:, idx]))
+
+        # print current F1-score
+        print('Column: {}'.format(column))
+        print('F1-Score: {}\n'.format(f1scores[-1]))
+
+    return f1scores
 
 
 def save_model(model, model_filepath):
-    pass
+    """
+    The function saves the trained model into model_filepath.
+    """
+    pickle.dump(model, open(model_filepath, 'wb'))
+
+    return
 
 
 def main():
