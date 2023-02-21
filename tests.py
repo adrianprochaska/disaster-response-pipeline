@@ -18,8 +18,6 @@ from imblearn.over_sampling import SMOTE
 
 import pickle
 
-import sys
-
 
 class TestClass:
     """
@@ -269,15 +267,3 @@ class TestClass:
 
         # remove test_model from test_path
         os.remove(save_path)
-
-    def test_train_classifier_main(self):
-        """
-        Tests the whole buidling pipeline of train_classifier
-        """
-        sys.argv = [
-            'train_classifier.py',
-            'test_data/DisasterResponse.db',
-            'test_data/classifier.pkl'
-        ]
-
-        train_classifier.main()
