@@ -4,10 +4,9 @@
 
 1. [Installation](#installation)
 2. [Usage](#usage)
-2. [Project Motivation](#project-motivation)
-3. [File Descriptions](#files)
-4. [Results](#results)
-5. [Licensing, Authors, and Acknowledgements](#)
+3. [Project Motivation](#project-motivation)
+4. [File Descriptions](#files)
+5. [Licensing, Authors, and Acknowledgements](#licensing-authors-acknowledgements)
 
 ## Instructions
 1. Run the following commands in the project's root directory to set up your database and model.
@@ -32,7 +31,18 @@ pip install -r requirements.txt
 ```
 
 ## Usage
-To run the web app, execute `run.py` in `./app`.
+
+The code consists of three major parts:
+1. Data Processing: The data is already uploaded to this repository. If you want to execute the data processing again, you shall perform the following steps:
+  *  navigate to the `data` folder.
+  * execute `python process_data ...`
+2. Model Identification: Trains a model based on the saved data. For this:
+  *  navigate to the `models` folder.
+  * execute `python train_classifier ...`
+3. Web App: Runs the Flask Web App Server, to display results and classify custom messages. To use the web app:
+  *  navigate to the `app` folder.
+  * execute `python run`
+  * go to https://127.0.0.0:3000 in your browser.
 
 ## Project Motivation
 This project is a udacity project.
@@ -65,5 +75,6 @@ test.ps1
 ```
 
 ## Licensing, Authors, Acknowledgements
+Thanks to Figure Eight/Appen to provide the dataset for this Udacity project.
 
-
+Otherwise, feel free to use the code here as you would like! 
