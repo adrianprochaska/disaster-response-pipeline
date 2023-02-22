@@ -18,6 +18,7 @@ from imblearn.over_sampling import SMOTE
 
 import joblib
 
+
 class TestClass:
     """
     Test class for disaster response pipeline.

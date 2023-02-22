@@ -11,7 +11,7 @@ import joblib
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from models.train_classifier import load_dataframe  # noqa: E402
+from models.train_classifier import load_dataframe, tokenize  # noqa:E402,F401
 
 app = Flask(__name__)
 
