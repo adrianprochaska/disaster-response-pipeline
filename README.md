@@ -8,22 +8,6 @@
 4. [File Descriptions](#files)
 5. [Licensing, Authors, and Acknowledgements](#licensing-authors-acknowledgements)
 
-## Instructions
-1. Run the following commands in the project's root directory to set up your database and model.
-
-    - To run ETL pipeline that cleans data and stores in database
-        `python data/process_data.py data/disaster_messages.csv data/disaster_categories.csv data/DisasterResponse.db`
-    - To run ML pipeline that trains classifier and saves
-        `python models/train_classifier.py data/DisasterResponse.db models/classifier.pkl`
-
-2. Go to `app` directory: `cd app`
-
-3. Run your web app: `python run.py`
-
-4. Click the `PREVIEW` button to open the homepage
-
-5.
-
 ## Installation
 Install the necessary requirements by running
 ``` 
@@ -35,10 +19,10 @@ pip install -r requirements.txt
 The code consists of three major parts:
 1. Data Processing: The data is already uploaded to this repository. If you want to execute the data processing again, you shall perform the following steps:
   *  navigate to the `data` folder.
-  * execute `python process_data ...`
+  * execute `python process_data disaster_messages.csv disaster_categories.csv DisasterResponse.db`
 2. Model Identification: Trains a model based on the saved data. For this:
   *  navigate to the `models` folder.
-  * execute `python train_classifier ...`
+  * execute `python train_classifier ../data/DisasterResponse.db classifier.pkl`
 3. Web App: Runs the Flask Web App Server, to display results and classify custom messages. To use the web app:
   *  navigate to the `app` folder.
   * execute `python run`
@@ -51,28 +35,31 @@ Additional features compared to the task description:
 - Testing is done for most of the functions.
 
 ## File Descriptions
-This is the top level description of this repository.
-For more information on the scripts contained in the child directories, go to the readme-files inside those directories.
-
-```
-.vscode/
+High level description of the files in this repository.
+* `.vscode/`:  
     Contains settings for Visual Studio Code.
-app/
+
+* `app/`:  
     Contains the flask web app.
-data/
+
+* `data/`:  
     Contains the data preproces.ing pipeline
-models/
+
+* `models/`:  
     Contains the training process of the NLP model.
-preparation/
+
+* `preparation/`:  
     Contains jupyter notebooks and other files to play around with in an exploratory style.
-test_data/
+
+* `test_data/`:  
     Contains the data necessary for testing.
-tests.py
+
+* `tests.py`:  
     Contains the tests executed on the code.
-    The test ... takes up a lot of time, since it executes the building process.
-test.ps1
+
+* `test.ps1`:  
     This is a powershell script for running pytest and flake8.
-```
+
 
 ## Licensing, Authors, Acknowledgements
 Thanks to Figure Eight/Appen to provide the dataset for this Udacity project.
