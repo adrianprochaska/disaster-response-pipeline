@@ -16,8 +16,7 @@ from sklearn.metrics import f1_score
 from imblearn.over_sampling import SMOTE
 # from imblearn.pipeline import Pipeline
 
-import pickle
-
+import joblib
 
 class TestClass:
     """
@@ -30,8 +29,8 @@ class TestClass:
         Tests the load_data function
         """
         process_data.load_data(
-            'data\\disaster_messages.csv',
-            'data\\disaster_categories.csv'
+            'data/disaster_messages.csv',
+            'data/disaster_categories.csv'
         )
 
     def test_str_to_categories(self):
@@ -250,15 +249,15 @@ class TestClass:
         This function tests the save_model function.
         """
         # load test_model
-        test_model_path = '.\\test_data\\test_model.pkl'
-        model = pickle.load(open(test_model_path, 'rb'))
+        test_model_path = './test_data/test_model.pkl'
+        model = joblib.load(open(test_model_path, 'rb'))
 
         # save test_model to a test_path
-        save_path = '.\\test_data\\pytest_model.pkl'
+        save_path = './test_data/pytest_model.pkl'
         train_classifier.save_model(model, save_path)
 
         # load it again
-        model_reload = pickle.load(open(test_model_path, 'rb'))
+        model_reload = joblib.load(open(test_model_path, 'rb'))
 
         # compare models and assert False if they are not the same
         assert isinstance(model_reload, type(model))

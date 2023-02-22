@@ -5,7 +5,7 @@ from flask import Flask
 from flask import render_template, request
 from plotly.graph_objs import Bar
 
-import pickle
+import joblib
 
 # import load_dataframe and add parent path to search path
 import sys
@@ -23,7 +23,7 @@ model_path = '..\\models\\classifier.pkl'
 # model = joblib.load(open(model_path, 'rb'))
 
 # test_model_path = '.\\test_data\\test_model.pkl'
-model = pickle.load(open(model_path, 'rb'))
+model = joblib.load(open(model_path, 'rb'))
 
 
 # index webpage displays cool visuals and receives user input text for model

@@ -7,7 +7,7 @@ from sqlalchemy import create_engine, inspect
 
 import re
 
-# import nltk
+import nltk
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem.wordnet import WordNetLemmatizer
@@ -23,6 +23,10 @@ from imblearn.over_sampling import SMOTE
 from imblearn.pipeline import Pipeline
 
 import joblib
+
+nltk.download('punkt')
+nltk.download('stopwords')
+nltk.download('wordnet')
 
 
 def load_data(database_filepath):
